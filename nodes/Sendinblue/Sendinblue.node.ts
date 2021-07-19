@@ -119,6 +119,9 @@ export class Sendinblue implements INodeType {
 						BOUTIQUE: itemStr['Je suis la boutique de'],
 					}
 					if (typeof item['Mail'] == "string"){
+						if (item['Mail'] == ""){
+							continue;
+						}
 						const data = {
 							email: item['Mail'].toLowerCase(),
 							attributes: attr,

@@ -10,7 +10,8 @@ import {
 } from 'n8n-workflow';
 
 
-var SibApiV3Sdk = require('sib-api-v3-sdk');
+// tslint:disable-next-line:variable-name
+const SibApiV3Sdk = require('sib-api-v3-sdk');
 
 export class Sendinblue implements INodeType {
 	description: INodeTypeDescription = {
@@ -73,14 +74,14 @@ export class Sendinblue implements INodeType {
 	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
 		const items = this.getInputData();
 
-		let returnData :Array<IDataObject> = [];
+		const returnData :IDataObject[] = [];
 		const resource = this.getNodeParameter('resource', 0) as string;
 		const operation = this.getNodeParameter('operation', 0) as string;
 		//Get credentials the user provided for this node
 		const credentials = this.getCredentials('sendinblueApi') as IDataObject;
 		const defaultClient = SibApiV3Sdk.ApiClient.instance;
 		const apiKey = defaultClient.authentications['api-key'];
-		apiKey.apiKey = credentials['apiKey']
+		apiKey.apiKey = credentials['apiKey'];
 
 		const apiInstance = new SibApiV3Sdk.ContactsApi();
 
@@ -89,27 +90,31 @@ export class Sendinblue implements INodeType {
 
 			if (operation === 'create') {
 				for (let i = 0; i < items.length; i++) {
-					let item = items[i].json
-					var createContact = new SibApiV3Sdk.CreateContact();
+					const item = items[i].json;
+					const createContact = new SibApiV3Sdk.CreateContact();
 					interface StringMap { [key: string]: string; }
-					interface numberMap {[key: string]: number}
-					interface myDictionary { [index: string]: any; };
+					// tslint:disable-next-line:class-name
+					interface numberMap {[key: string]: number;}
 
-					let itemStr: myDictionary = {}
+					// tslint:disable-next-line:class-name no-any
+					interface myDictionary { [index: string]: any; }
 
-					for (let key in item) {
-						let value = item[key];
-						if (typeof  value == "string") {
-							itemStr[key] = value
+					const itemStr: myDictionary = {};
+
+					// tslint:disable-next-line:forin
+					for (const key in item) {
+						const value = item[key];
+						if (typeof  value === "string") {
+							itemStr[key] = value;
 						}
-						else if (value != undefined && value != null){
-							itemStr[key] = value.toString()
+						else if (value !== undefined && value != null){
+							itemStr[key] = value.toString();
 						}
 
 					}
-					var attr: StringMap= {
+					const attr: StringMap= {
 						CIVILITE: itemStr['Civilité'],
-						NOM: itemStr['Nom'] ?? "",
+						NOM: itemStr['Nom'] || "",
 						PRENOM: itemStr['Prénom'],
 						VILLE: itemStr['Ville'],
 						CODEPOSTAL: itemStr['Code Postal'],
@@ -117,21 +122,22 @@ export class Sendinblue implements INodeType {
 						TELEPHONE: itemStr['Tel Fixe'],
 						PORTABLE: itemStr['tel Portable'],
 						BOUTIQUE: itemStr['Je suis la boutique de'],
-					}
-					if (typeof item['Mail'] == "string"){
-						if (item['Mail'] == ""){
+					};
+					const mail = item['Mail'];
+					if (typeof mail === "string"){
+						if (mail === ""){
 							continue;
 						}
 						const data = {
-							email: item['Mail'].toLowerCase(),
+							email: mail.toLowerCase(),
 							attributes: attr,
 							emailBlacklisted: false,
 							smsBlacklisted: false,
 							listIds: [item['ID LISTE']],
 							updateEnabled: true,
 						};
-						console.log(data)
-						await apiInstance.createContact(data)
+						console.log(data);
+						await apiInstance.createContact(data);
 
 					}
 

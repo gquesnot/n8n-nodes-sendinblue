@@ -7,13 +7,13 @@ yes | cp -rf dist/credentials/*  /home/forge/n8n.marquedigitale.fr/packages/node
 cd /home/forge/n8n.marquedigitale.fr/packages/nodes-base/ || return
 if grep -q "Sendinblue.credentials.js" package.json; test $? -eq 1; then
   echo 1
-  match='    \"credentials\": ['
+  match='    \"credentials\": \['
   insert='      "dist/credentials/SendinblueApi.credentials.js",'
   sed -i "s/$match/$match\n$insert/" package.json
 fi
 if grep -q "Sendinblue.node.js" package.json; test $? -eq 1; then
   echo 2
-  match='    \"nodes\": ['
+  match='    \"nodes\": \['
   insert='      "dist/nodes/Sendinblue/Sendinblue.node.js",'
   sed "s/$match/$match\n$insert/" package.json
 

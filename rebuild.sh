@@ -21,10 +21,10 @@ if grep -q "sib-api-v3-sdk" package.json; test $? -eq 1; then
   sed -i "s/$match/$match\n$insert/" package.json
   npm i
 fi
-export N8N_HOST=localhost
-export WEBHOOK_TUNNEL_URL=http://localhost:5678
-export N8N_PORT=5678
 cd /home/forge/n8n.marquedigitale.fr || return
+export N8N_PORT=5678
+export N8N_HOST=localhost
+export WEBHOOK_TUNNEL_URL=http://localhost:5678/
 killall -9 node
 lerna bootstrap --hoist
 npm run build

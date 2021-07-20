@@ -10,8 +10,19 @@ import {
 } from 'n8n-workflow';
 
 
-// tslint:disable-next-line:prefer-const
-let SibApiV3Sdk = require('sib-api-v3-sdk');
+
+
+// tslint:disable-next-line:variable-name
+const SibApiV3Sdk = require('sib-api-v3-sdk');
+
+function getClient(parent: IExecuteFunctions| ILoadOptionsFunctions){
+	const credentials = parent.getCredentials('sendinblueApi') as IDataObject;
+	const defaultClient = SibApiV3Sdk.ApiClient.instance;
+	const apiKey = defaultClient.authentications['api-key'];
+	apiKey.apiKey = credentials['apiKey'];
+
+	return new SibApiV3Sdk.ContactsApi();
+}
 
 export class Sendinblue implements INodeType {
 	description: INodeTypeDescription = {
@@ -69,90 +80,127 @@ export class Sendinblue implements INodeType {
 				description: 'The operation to perform.',
 			},
 			{
-				displayName: 'sib ListIdd',
+				displayName: 'List ID',
 				name: 'listId',
-				type: 'string',
-				required: false,
-				default:'',
-				description:'default listId for sib',
+				type: 'options',
+				typeOptions: {
+					loadOptionsMethod: 'getLists',
+				},
+				default: 'aucune',
+				options: [{name:'aucune', value: "-1"}],
+				description: 'List of lists',
+				required:true,
 			},
 		],
 	};
+	methods = {
+		loadOptions: {
+
+			// Get all the available lists to display them to user so that he can
+			// select them easily
+			async getLists(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+				const returnData: INodePropertyOptions[] = [{name:"aucune", value:"-1"}];
+				const apiInstance = getClient(this);
+
+				const lists = await apiInstance.getLists();
+				const tmpList = lists['lists'];
+				//const lists = await mailchimpApiRequestAllItems.call(this, '/lists', 'GET', 'lists');
+				for (const list of tmpList) {
+					const listName = list.name;
+					const listId = list.id;
+					returnData.push({
+						name: listName,
+						value: listId,
+					});
+				}
+				return returnData;
+			}
+		}
+	};
+
+
 
 	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
 		const items = this.getInputData();
-
 		const returnData :IDataObject[] = [];
+		const apiInstance = getClient(this);
+
 		const resource = this.getNodeParameter('resource', 0) as string;
 		const operation = this.getNodeParameter('operation', 0) as string;
+		const listId = this.getNodeParameter('listId', 0) as string;
 		//Get credentials the user provided for this node
-		const credentials = this.getCredentials('sendinblueApi') as IDataObject;
-		const defaultClient = SibApiV3Sdk.ApiClient.instance;
-		const apiKey = defaultClient.authentications['api-key'];
-		apiKey.apiKey = credentials['apiKey'];
-
-		const apiInstance = new SibApiV3Sdk.ContactsApi();
 
 
-		if (resource === 'member') {
+		const listIdNumber = parseInt(listId,10);
+		if (isNaN(listIdNumber)){
+			return [this.helpers.returnJsonArray(returnData)];
+		}
+		if (resource === 'member' && operation === 'create') {
+			for (let i = 0; i < items.length; i++) {
+				const item = items[i].json;
+				const createContact = new SibApiV3Sdk.CreateContact();
 
-			if (operation === 'create') {
-				for (let i = 0; i < items.length; i++) {
-					const item = items[i].json;
-					const createContact = new SibApiV3Sdk.CreateContact();
-					interface StringMap { [key: string]: string; }
-					// tslint:disable-next-line:class-name
-					interface numberMap {[key: string]: number;}
+				interface StringMap {
+					[key: string]: string;
+				}
 
-					// tslint:disable-next-line:class-name no-any
-					interface myDictionary { [index: string]: any; }
+				interface NumberMap {
+					[key: string]: number;
+				}
 
-					const itemStr: myDictionary = {};
+				// tslint:disable-next-line:no-any
+				interface MyDictionary {
+					// tslint:disable-next-line:no-any
+					[index: string]: any;
+				}
 
-					// tslint:disable-next-line:forin
-					for (const key in item) {
-						const value = item[key];
-						if (typeof  value === "string") {
-							itemStr[key] = value;
-						}
-						else if (value !== undefined && value != null){
-							itemStr[key] = value.toString();
-						}
+				const itemStr: MyDictionary = {};
 
+				// tslint:disable-next-line:forin
+				for (const key in item) {
+					const value = item[key];
+					if (typeof value === "string") {
+						itemStr[key] = value;
+					} else if (value !== undefined && value !== null) {
+						itemStr[key] = value.toString();
 					}
-					const attr: StringMap= {
-						CIVILITE: itemStr['Civilité'],
-						NOM: itemStr['Nom'],
-						PRENOM: itemStr['Prénom'],
-						VILLE: itemStr['Ville'],
-						CODEPOSTAL: itemStr['Code Postal'],
-						ADRESSE: itemStr['Adresse 1'],
-						TELEPHONE: itemStr['Tel Fixe'],
-						PORTABLE: itemStr['tel Portable'],
-						BOUTIQUE: itemStr['Je suis la boutique de'],
+
+				}
+				//map attr
+				const attr: StringMap = {
+					CIVILITE: itemStr['Civilité'],
+					NOM: itemStr['Nom'] ? itemStr['Nom'] : "",
+					PRENOM: itemStr['Prénom'],
+					VILLE: itemStr['Ville'],
+					CODEPOSTAL: itemStr['Code Postal'],
+					ADRESSE: itemStr['Adresse 1'],
+					TELEPHONE: itemStr['Tel Fixe'],
+					PORTABLE: itemStr['tel Portable'],
+					BOUTIQUE: itemStr['Je suis la boutique de'],
+				};
+				const mail = item['Mail'];
+				if (typeof mail === "string") {
+					if (mail === "") {
+						continue;
+					}
+					//request data
+					const data = {
+						email: mail.toLowerCase(),
+						attributes: attr,
+						emailBlacklisted: false,
+						smsBlacklisted: false,
+						listIds: [listIdNumber === -1 ? item['ID LISTE'] : listIdNumber],
+						updateEnabled: true,
 					};
-					const mail = item['Mail'];
-					if (typeof mail === "string"){
-						const data = {
-							email: mail.toLowerCase(),
-							attributes: attr,
-							emailBlacklisted: false,
-							smsBlacklisted: false,
-							listIds: [item['ID LISTE']],
-							updateEnabled: true,
-						};
-						console.log(data);
-						await apiInstance.createContact(data);
-
-					}
-
-
-
-
+					await apiInstance.createContact(data);
+					const resData = attr;
+					// @ts-ignore
+					resData.listIds = data.listIds;
+					resData.email = data.email;
+					returnData.push(resData);
 				}
 			}
 		}
-
 		// Map data to n8n data
 		return [this.helpers.returnJsonArray(returnData)];
 	}

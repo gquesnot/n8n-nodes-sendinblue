@@ -11,9 +11,9 @@ if grep -q "Sendinblue" package.json; test $? -eq 1; then
   sed 's/"dependencies": {\n"sib-api-v3-sdk": "^8.2.1"/' package.json
   npm i
 fi
-npm i
 cd /home/forge/n8n.marquedigitale.fr || return
 lerna bootstrap --hoist
 npm run build
-
+sudo kill -9 $(sudo lsof -t -i:5678)
+(npm run start&)
 

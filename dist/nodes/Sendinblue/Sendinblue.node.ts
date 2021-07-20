@@ -69,7 +69,7 @@ export class Sendinblue implements INodeType {
 				description: 'The operation to perform.',
 			},
 			{
-				displayName: 'sib ListId',
+				displayName: 'sib ListIdd',
 				name: 'listId',
 				type: 'string',
 				required: false,

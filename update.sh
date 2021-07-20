@@ -2,8 +2,8 @@ cd /home/forge/n8n.marquedigitale.fr || return
 git pull
 cd ../tmp/n8n-nodes-sendinblue || return
 git pull
-cp -rf dist/nodes/  /home/forge/n8n.marquedigitale.fr/packages/nodes-base/nodes
-cp -rf dist/credentials/  /home/forge/n8n.marquedigitale.fr/packages/nodes-base/credentials/
+cp -rfi dist/nodes/*  /home/forge/n8n.marquedigitale.fr/packages/nodes-base/nodes
+cp -rfi dist/credentials/*  /home/forge/n8n.marquedigitale.fr/packages/nodes-base/credentials/
 cd /home/forge/n8n.marquedigitale.fr/packages/nodes-base/ || return
 if grep -q "Sendinblue" package.json; test $? -eq 1; then
   sed 's/"credentials": [/"credentials": [\n"dist/credentials/SendinblueApi.credentials.js",/' package.json
@@ -14,6 +14,5 @@ fi
 cd /home/forge/n8n.marquedigitale.fr || return
 lerna bootstrap --hoist
 npm run build
-
 
 

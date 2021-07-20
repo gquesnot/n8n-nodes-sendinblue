@@ -68,6 +68,14 @@ export class Sendinblue implements INodeType {
 				default: 'create',
 				description: 'The operation to perform.',
 			},
+			{
+				displayName: 'sib ListId',
+				name: 'listId',
+				type: 'string',
+				required: false,
+				default:'',
+				description:'default listId for sib',
+			},
 		],
 	};
 

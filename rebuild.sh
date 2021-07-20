@@ -25,7 +25,7 @@ export N8N_HOST=localhost
 export WEBHOOK_TUNNEL_URL=http://localhost:5678
 export N8N_PORT=5678
 cd /home/forge/n8n.marquedigitale.fr || return
-sudo killall -9 node
+killall -9 node
 lerna bootstrap --hoist
 npm run build
 (npm run start&)

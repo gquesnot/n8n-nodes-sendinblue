@@ -24,5 +24,5 @@ fi
 cd /home/forge/n8n.marquedigitale.fr || return
 lerna bootstrap --hoist
 npm run build
-sudo kill -9 $(sudo lsof -t -i:5678) >/dev/null 2>/dev/null &
+sudo killall -9 node
 (npm run start&)

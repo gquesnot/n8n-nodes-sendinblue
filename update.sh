@@ -13,8 +13,8 @@ if grep -q "Sendinblue.credentials.js" package.json; test $? -eq 1; then
 fi
 if grep -q "Sendinblue.node.js" package.json; test $? -eq 1; then
   echo 2
-  match='   1 \"no2des\": 3['
-  insert='      "dist/nodes/Sendinblue/Sendinblue.node.js",'
+  match='    \"nodes\": ['
+  insert='      "dist\/nodes\/Sendinblue\/Sendinblue.node.js",'
   sed -i "s/$match/$match\n$insert/" package.json
 
 fi

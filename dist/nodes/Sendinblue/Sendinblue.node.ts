@@ -102,7 +102,7 @@ export class Sendinblue implements INodeType {
 				const returnData: INodePropertyOptions[] = [{name:"aucune", value:"-1"}];
 				const apiInstance = getClient(this);
 
-				const lists = await apiInstance.getLists({limit:100});
+				const lists = await apiInstance.getLists({limit:50});
 				const tmpList = lists['lists'];
 				for (const list of tmpList) {
 					const listName = list.name;

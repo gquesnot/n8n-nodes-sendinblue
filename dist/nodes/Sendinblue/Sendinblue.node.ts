@@ -102,21 +102,31 @@ export class Sendinblue implements INodeType {
 				const returnData: INodePropertyOptions[] = [{name:"aucune", value:"-1"}];
 				const apiInstance = getClient(this);
 
-				const lists = await apiInstance.getLists({limit:50});
-				const tmpList = lists['lists'];
-				for (const list of tmpList) {
-					const listName = list.name;
-					const listId = list.id;
-					returnData.push({
-						name: listName,
-						value: listId,
-					});
+				let lists = await apiInstance.getLists({limit:50});
+
+				let tmpList = lists['lists'];
+				let offset = 0;
+				//const lists = await mailchimpApiRequestAllItems.call(this, '/lists', 'GET', 'lists');
+				while (tmpList.length === 50){
+					console.log(tmpList.length);
+					for (const list of tmpList) {
+						const listName = list.name;
+						const listId = list.id;
+						returnData.push({
+							name: listName,
+							value: listId,
+						});
+					}
+					offset += 50;
+					lists = await apiInstance.getLists({limit:50, offset:offset});
+
+					tmpList = lists['lists'];
 				}
+
 				return returnData;
 			}
 		}
 	};
-
 
 
 	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {

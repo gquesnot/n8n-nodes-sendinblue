@@ -24,6 +24,13 @@ function getClient(parent: IExecuteFunctions| ILoadOptionsFunctions){
 	return new SibApiV3Sdk.ContactsApi();
 }
 
+
+function validateEmail(mail: string)
+{
+	return /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(mail);
+
+}
+
 export class Sendinblue implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'Sendinblue',
@@ -189,7 +196,7 @@ export class Sendinblue implements INodeType {
 				};
 				const mail = item['Mail'];
 				if (typeof mail === "string") {
-					if (mail === "") {
+					if (mail === "" || !validateEmail(mail)) {
 						continue;
 					}
 					//request data
@@ -201,6 +208,7 @@ export class Sendinblue implements INodeType {
 						listIds: [listIdNumber === -1 ? item['ID LISTE'] : listIdNumber],
 						updateEnabled: true,
 					};
+					console.log(data);
 					await apiInstance.createContact(data);
 					const resData = attr;
 					// @ts-ignore

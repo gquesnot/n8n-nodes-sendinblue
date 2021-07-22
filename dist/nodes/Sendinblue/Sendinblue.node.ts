@@ -207,7 +207,6 @@ export class Sendinblue implements INodeType {
 						listIds: [listIdNumber === -1 ? item['ID LISTE'] : listIdNumber],
 						updateEnabled: true,
 					};
-					console.log(data);
 					await apiInstance.createContact(data);
 					const resData = attr;
 					// @ts-ignore

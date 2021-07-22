@@ -115,7 +115,6 @@ export class Sendinblue implements INodeType {
 				let offset = 0;
 				//const lists = await mailchimpApiRequestAllItems.call(this, '/lists', 'GET', 'lists');
 				while (tmpList.length === 50){
-					console.log(tmpList.length);
 					for (const list of tmpList) {
 						const listName = list.name;
 						const listId = list.id;

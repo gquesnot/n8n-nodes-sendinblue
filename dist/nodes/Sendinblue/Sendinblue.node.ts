@@ -124,12 +124,12 @@ export class Sendinblue implements INodeType {
 						});
 					}
 					offset += tmpList.length;
-					lists = await apiInstance.getLists({limit:50, offset:offset});
-
-					tmpList = lists['lists'];
-					if (tmpList.length === 50){
+					if (tmpList.length !== 50){
 						break;
 					}
+					lists = await apiInstance.getLists({limit:50, offset});
+					tmpList = lists['lists'];
+
 				}
 
 				return returnData;

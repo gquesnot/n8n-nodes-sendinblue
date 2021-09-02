@@ -21,7 +21,10 @@ function getClient(parent: IHookFunctions | IExecuteFunctions | IExecuteSingleFu
 	const credentials = parent.getCredentials('sendinblueApi');
 	const defaultClient = SibApiV3Sdk.ApiClient.instance;
 	const apiKey = defaultClient.authentications['api-key'];
-	apiKey.apiKey = credentials['apiKey'];
+	if (credentials){
+		apiKey.apiKey = credentials.apiKey;
+		new SibApiV3Sdk.ContactsApi();
+	}
 
 	return new SibApiV3Sdk.ContactsApi();
 }
@@ -140,7 +143,7 @@ export class Sendinblue implements INodeType {
 	};
 
 
-	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
+	async execute(this:  IExecuteFunctions): Promise<INodeExecutionData[][]> {
 		const items = this.getInputData();
 		const returnData :IDataObject[] = [];
 		const apiInstance = getClient(this);

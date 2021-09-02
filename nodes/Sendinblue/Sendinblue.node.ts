@@ -118,7 +118,7 @@ export class Sendinblue implements INodeType {
 						PRENOM: itemStr['Prénom'],
 						VILLE: itemStr['Ville'],
 						CODEPOSTAL: itemStr['Code Postal'],
-						ADRESSE: itemStr['Adresse 1'],
+						ADRESSE: itemStr['numero rue'] + " " + itemStr['Adresse 1'] + " " + itemStr['Adresse 2'],
 						TELEPHONE: itemStr['Tel Fixe'],
 						PORTABLE: itemStr['tel Portable'],
 						BOUTIQUE: itemStr['Je suis la boutique de'],

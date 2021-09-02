@@ -7,6 +7,8 @@ import {
 	INodePropertyOptions,
 	INodeType,
 	INodeTypeDescription,
+	IHookFunctions,
+	IExecuteSingleFunctions,
 } from 'n8n-workflow';
 
 
@@ -15,8 +17,8 @@ import {
 // tslint:disable-next-line:variable-name
 const SibApiV3Sdk = require('sib-api-v3-sdk');
 
-function getClient(this: IHookFunctions | IExecuteFunctions | IExecuteSingleFunctions | ILoadOptionsFunctions){
-	const credentials = this.getCredentials('sendinblueApi');
+function getClient(parent: IHookFunctions | IExecuteFunctions | IExecuteSingleFunctions | ILoadOptionsFunctions){
+	const credentials = parent.getCredentials('sendinblueApi');
 	const defaultClient = SibApiV3Sdk.ApiClient.instance;
 	const apiKey = defaultClient.authentications['api-key'];
 	apiKey.apiKey = credentials['apiKey'];

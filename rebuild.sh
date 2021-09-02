@@ -1,4 +1,3 @@
-cd ../tmp/n8n-nodes-sendinblue || return
 yes | cp -rf dist/nodes/*  /home/forge/n8n.marquedigitale.fr/packages/nodes-base/nodes
 yes | cp -rf dist/credentials/*  /home/forge/n8n.marquedigitale.fr/packages/nodes-base/credentials/
 cd /home/forge/n8n.marquedigitale.fr/packages/nodes-base/ || return

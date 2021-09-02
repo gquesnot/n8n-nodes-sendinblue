@@ -24,7 +24,7 @@ function getClient(parent: IHookFunctions | IExecuteFunctions | IExecuteSingleFu
 	if (credentials){
 		if ('apiKey' in credentials){
 			apiKey.apiKey = credentials.apiKey;
-			new SibApiV3Sdk.ContactsApi();
+			return new SibApiV3Sdk.ContactsApi();
 		}
 	}
 

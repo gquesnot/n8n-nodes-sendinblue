@@ -22,8 +22,10 @@ function getClient(parent: IHookFunctions | IExecuteFunctions | IExecuteSingleFu
 	const defaultClient = SibApiV3Sdk.ApiClient.instance;
 	const apiKey = defaultClient.authentications['api-key'];
 	if (credentials){
-		apiKey.apiKey = credentials.apiKey;
-		new SibApiV3Sdk.ContactsApi();
+		if ('apiKey' in credentials){
+			apiKey.apiKey = credentials.apiKey;
+			new SibApiV3Sdk.ContactsApi();
+		}
 	}
 
 	return new SibApiV3Sdk.ContactsApi();

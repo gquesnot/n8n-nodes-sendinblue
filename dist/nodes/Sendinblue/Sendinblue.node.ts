@@ -11,11 +11,6 @@ import {
 	IExecuteSingleFunctions,
 } from 'n8n-workflow';
 
-import {
-	IDataObject, NodeApiError, NodeOperationError,
-} from 'n8n-workflow';
-
-
 
 // tslint:disable-next-line:variable-name
 const SibApiV3Sdk = require('sib-api-v3-sdk');

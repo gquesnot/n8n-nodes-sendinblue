@@ -11,24 +11,24 @@ import {
 	IExecuteSingleFunctions,
 } from 'n8n-workflow';
 
+import {
+	IDataObject, NodeApiError, NodeOperationError,
+} from 'n8n-workflow';
 
 
 
 // tslint:disable-next-line:variable-name
 const SibApiV3Sdk = require('sib-api-v3-sdk');
 
-function getClient(parent: IHookFunctions | IExecuteFunctions | IExecuteSingleFunctions | ILoadOptionsFunctions){
-	const credentials = parent.getCredentials('sendinblueApi');
+async function getClient(parent: IHookFunctions | IExecuteFunctions | IExecuteSingleFunctions | ILoadOptionsFunctions){
+	const credentials = await parent.getCredentials('sendinblueApi') as IDataObject;
+	const myApiKey = credentials.apiKey;
 	const defaultClient = SibApiV3Sdk.ApiClient.instance;
 	const apiKey = defaultClient.authentications['api-key'];
-	if (credentials){
-		if ('apiKey' in credentials){
-			apiKey.apiKey = credentials.apiKey;
-			return new SibApiV3Sdk.ContactsApi();
-		}
-	}
-
+	apiKey.apiKey = myApiKey;
 	return new SibApiV3Sdk.ContactsApi();
+
+
 }
 
 
@@ -112,9 +112,11 @@ export class Sendinblue implements INodeType {
 
 			// Get all the available lists to display them to user so that he can
 			// select them easily
-			async getLists(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+			async getLists(this: IHookFunctions | IExecuteFunctions | IExecuteSingleFunctions | ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
 				const returnData: INodePropertyOptions[] = [{name:"aucune", value:"-1"}];
-				const apiInstance = getClient(this);
+
+
+				const apiInstance = await getClient(this);
 
 				let lists = await apiInstance.getLists({limit:50});
 
@@ -148,7 +150,7 @@ export class Sendinblue implements INodeType {
 	async execute(this:  IExecuteFunctions): Promise<INodeExecutionData[][]> {
 		const items = this.getInputData();
 		const returnData :IDataObject[] = [];
-		const apiInstance = getClient(this);
+		const apiInstance = await getClient(this);
 
 		const resource = this.getNodeParameter('resource', 0) as string;
 		const operation = this.getNodeParameter('operation', 0) as string;
